@@ -91,6 +91,17 @@ class TestV2PrivateArticlesCrud:
         )
         save_response(response, "api-create-no-title")
         assert response.status == 400
+    
+    def test_article_includes_reproducibility_level(self, draft_dataset, save_response):
+        """GET /v2/account/articles/<uuid> includes reproducibility_level (null when unset)."""
+        page, container_uuid = draft_dataset
+        response = page.request.get(f"/v2/account/articles/{container_uuid}")
+        save_response(response, "api-get-article-reproducibility-level")
+        assert response.status == 200
+        data = response.json()
+        assert "reproducibility_level" in data
+        # New drafts have no value yet – field must be present and null.
+        assert data["reproducibility_level"] is None
 
     def test_get_private_article(self, draft_dataset, save_response):
         """GET /v2/account/articles/<uuid> → 200 with details."""
